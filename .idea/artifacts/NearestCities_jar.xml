@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="NearestCities:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/NearestCities_jar</output-path>
+    <root id="archive" name="NearestCities.jar">
+      <element id="module-output" name="NearestCities" />
+    </root>
+  </artifact>
+</component>
