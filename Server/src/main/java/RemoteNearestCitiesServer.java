@@ -4,14 +4,16 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.rmi.RemoteException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class RemoteNearestCitiesServer implements NearestCities{
     private final static String JSON_FILE_NAME = "Server/citylist.json";
     OpenWeatherMapJsonParser openWeatherMapJsonParser = new OpenWeatherMapJsonParser();
-    MySQLClass sql = new MySQLClass();
+    TicketCache ticketCache = new TicketCache();
+//    MySQLClass sql = new MySQLClass();
     Calculator calculation = new Calculator();
-    List<Integer> listTicketId;
-    int countTicketId;
+//    List<Integer> listTicketId;
+//    int countTicketId;
 
     private static List<CityData> jsonToCityData(String fileName) throws FileNotFoundException {
         return Arrays.asList(new Gson().fromJson(new FileReader(fileName), CityData[].class));
@@ -47,9 +49,9 @@ public class RemoteNearestCitiesServer implements NearestCities{
 
     @Override
     public int addTicket(double lat, double lon, int distance) throws RemoteException {
-        incrementTicketId();
-        sql.addTicket(new Ticket(countTicketId, lat, lon, distance));
-        return countTicketId;
+//        incrementTicketId();
+//        sql.addTicket(new Ticket(countTicketId, lat, lon, distance));
+        return ticketCache.addTicket(lat, lon, distance);
     }
 
     @Override
@@ -74,17 +76,45 @@ public class RemoteNearestCitiesServer implements NearestCities{
                 }
             }
         }
-        return map;
+        TreeMap<CityData, Integer> treeMap = new TreeMap<>(map);
+        map = treeMap;
+        Map<CityData, Integer> returnMap = map.entrySet().stream()
+                .sorted(Map.Entry.<CityData, Integer>comparingByValue().reversed())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (a, b) -> a,
+                        LinkedHashMap::new
+                ));
+        return returnMap;
     }
 
-    public void incrementTicketId(){
-        listTicketId = sql.getTicketId();
-        if(listTicketId != null && !listTicketId.isEmpty()){
-            countTicketId = listTicketId.get(listTicketId.size()-1);
-            countTicketId++;
-        }
-        else{
-            countTicketId++;
-        }
+    @Override
+    public String getReadyForecast(String city) throws RemoteException {
+        return openWeatherMapJsonParser.getReadyForecast(city);
     }
+
+    @Override
+    public Queue<Ticket> ticketQueue(Ticket ticket) throws RemoteException {
+//        Queue<Ticket> queue = new PriorityQueue<Ticket>();
+//        queue.add(ticket);
+        return ticketCache.ticketQueue(ticket);
+    }
+
+    @Override
+    public String deleteTicket(int id) throws RemoteException {
+        ticketCache.deleteTicket(id);
+        return "";
+    }
+
+//    public void incrementTicketId(){
+//        listTicketId = sql.getTicketId();
+//        if(listTicketId != null && !listTicketId.isEmpty()){
+//            countTicketId = listTicketId.get(listTicketId.size()-1);
+//            countTicketId++;
+//        }
+//        else{
+//            countTicketId++;
+//        }
+//    }
 }

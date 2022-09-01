@@ -5,6 +5,7 @@ import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MySQLClass {
     private final static String fileName = "database.properties";
@@ -135,6 +136,80 @@ public class MySQLClass {
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public void deleteTicket(int id){
+        try{
+            Connection conn = null;
+            PreparedStatement ps = null;
+
+            try{
+                conn = getConnection();
+                String query = "DELETE FROM ticket WHERE id = ?";
+                ps = conn.prepareStatement(query);
+                ps.setInt(1, id);
+                ps.executeUpdate();
+            } finally {
+                try{
+                    if(conn != null){
+                        conn.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+                try{
+                    if(ps != null){
+                        ps.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public List<Ticket> getTicketCache(){
+        List<Ticket> list = new CopyOnWriteArrayList<>();
+        try{
+            Connection conn = null;
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+
+            try{
+                conn = getConnection();
+                String query = "SELECT * FROM ticket";
+                ps = conn.prepareStatement(query);
+                rs = ps.executeQuery();
+
+                while (rs.next()){
+                    int id = rs.getInt("id");
+                    double lat = rs.getDouble("lat");
+                    double lon = rs.getDouble("lon");
+                    int distance = rs.getInt("distance");
+                    list.add(new Ticket(id, lat, lon, distance));
+                }
+            } finally {
+                try{
+                    if(conn != null){
+                        conn.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+                try{
+                    if(ps != null){
+                        ps.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return list;
     }
 
     public List<Integer> getTicketId(){

@@ -6,17 +6,14 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 public class Client {
     public static final String UNIQUE_BINDING_NAME = "server.NearestCities";
     static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
     static Registry registry;
     static NearestCities nearestCities;
-    private static Ticket ticket;
+    static Queue<Ticket> queue;
 
     static {
         try {
@@ -43,6 +40,7 @@ public class Client {
 
         System.out.println("City name or coordinates? c/k");
         cityOrCoordinate = reader.readLine();
+        Ticket ticket;
         if(cityOrCoordinate.equalsIgnoreCase("c")){
             System.out.println("for example: \"Dnipro\" or \"manchester\"");
             cityName = reader.readLine();
@@ -54,7 +52,8 @@ public class Client {
             task = nearestCities.addTicket(lat, lon, distance);
             ticket = new Ticket(task, lat, lon, distance);
             System.out.println("your ticket is №" + task);
-            nearestCities(ticket);
+            queue = nearestCities.ticketQueue(ticket);
+//            nearestCities(ticket);
         }
         else if(cityOrCoordinate.equalsIgnoreCase("k")){
             System.out.println("for example: \"48.0000\" or \"51.00\"");
@@ -65,11 +64,37 @@ public class Client {
             task = nearestCities.addTicket(lat, lon, distance);
             ticket = new Ticket(task, lat, lon, distance);
             System.out.println("your ticket is №" + task);
-            nearestCities(ticket);
+            queue = nearestCities.ticketQueue(ticket);
+//            nearestCities(ticket);
         }else{
             System.out.println("Incorrect :(");
             start();
         }
+        new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()){
+                try {
+                    for(Ticket t : queue){
+                        Thread.sleep(3000);
+                        nearestCities(t);
+                        queue.remove(t);
+                        nearestCities.deleteTicket(t.getId());
+                    }
+                } catch (IOException | InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }).start();
+        new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()){
+                try {
+                    start();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }).start();
     }
 
     public static void nearestCities(Ticket ticket) throws FileNotFoundException, RemoteException {
@@ -78,6 +103,8 @@ public class Client {
 //        TreeMap<CityData, Integer> treeMap = new TreeMap<>(cityDataMap);
         for(Map.Entry<CityData, Integer> entry : cityDataMap.entrySet()){
             System.out.println(entry.getKey().getName() + " " + entry.getKey().getCountry() + " " + entry.getKey().getState() + " " + entry.getValue());
+            System.out.println(nearestCities.getReadyForecast(entry.getKey().getName()));
+            System.out.println();
         }
     }
 
