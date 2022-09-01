@@ -212,6 +212,53 @@ public class MySQLClass {
         return list;
     }
 
+    public int isTicketId(int id){
+        int i = 0;
+
+        try{
+            Connection conn = null;
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+
+            try{
+                conn = getConnection();
+                String query = "SELECT id FROM ticket WHERE id = ?";
+                ps = conn.prepareStatement(query);
+                ps.setInt(1, id);
+                rs = ps.executeQuery();
+
+                while (rs.next()){
+                    i = rs.getInt("id");
+                }
+            }finally {
+                try{
+                    if(conn != null){
+                        conn.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+                try{
+                    if(ps != null){
+                        ps.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+                try{
+                    if(rs != null){
+                        rs.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return i;
+    }
+
     public List<Integer> getTicketId(){
         List<Integer> list = new LinkedList<>();
 

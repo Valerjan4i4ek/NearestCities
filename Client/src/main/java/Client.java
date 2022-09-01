@@ -13,7 +13,9 @@ public class Client {
     static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
     static Registry registry;
     static NearestCities nearestCities;
-    static Queue<Ticket> queue;
+//    static Queue<Ticket> queue;
+    static Ticket ticket;
+//    static boolean check = false;
 
     static {
         try {
@@ -27,10 +29,10 @@ public class Client {
     }
 
     public static void main(String[] args) throws IOException {
-        start();
+        letsStart();
     }
 
-    public static void start() throws IOException {
+    public static void letsStart() throws IOException {
         String cityOrCoordinate = "";
         String cityName = "";
         int task;
@@ -40,7 +42,7 @@ public class Client {
 
         System.out.println("City name or coordinates? c/k");
         cityOrCoordinate = reader.readLine();
-        Ticket ticket;
+
         if(cityOrCoordinate.equalsIgnoreCase("c")){
             System.out.println("for example: \"Dnipro\" or \"manchester\"");
             cityName = reader.readLine();
@@ -52,7 +54,7 @@ public class Client {
             task = nearestCities.addTicket(lat, lon, distance);
             ticket = new Ticket(task, lat, lon, distance);
             System.out.println("your ticket is №" + task);
-            queue = nearestCities.ticketQueue(ticket);
+//            queue = nearestCities.ticketQueue(ticket);
 //            nearestCities(ticket);
         }
         else if(cityOrCoordinate.equalsIgnoreCase("k")){
@@ -64,21 +66,33 @@ public class Client {
             task = nearestCities.addTicket(lat, lon, distance);
             ticket = new Ticket(task, lat, lon, distance);
             System.out.println("your ticket is №" + task);
-            queue = nearestCities.ticketQueue(ticket);
+//            queue = nearestCities.ticketQueue(ticket);
 //            nearestCities(ticket);
         }else{
             System.out.println("Incorrect :(");
-            start();
+            letsStart();
         }
         new Thread(() -> {
             while (!Thread.currentThread().isInterrupted()){
                 try {
-                    for(Ticket t : queue){
-                        Thread.sleep(3000);
-                        nearestCities(t);
-                        queue.remove(t);
-                        nearestCities.deleteTicket(t.getId());
+                    Thread.sleep(3000);
+//                    nearestCities(ticket);
+                    boolean check = nearestCities.isTicketId(ticket.getId());
+                    if (!check){
+                        nearestCities(ticket);
+                        nearestCities.deleteTicket(ticket.getId());
                     }
+
+//                    for(Ticket t : queue){
+//                        Thread.sleep(3000);
+//                        boolean check = nearestCities.isTicketId(t.getId());
+//                        if (check){
+//                            nearestCities(t);
+//                            queue.remove(t);
+//                            nearestCities.deleteTicket(t.getId());
+//                        }
+//
+//                    }
                 } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -88,7 +102,7 @@ public class Client {
         new Thread(() -> {
             while (!Thread.currentThread().isInterrupted()){
                 try {
-                    start();
+                    letsStart();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

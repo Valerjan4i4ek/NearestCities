@@ -22,18 +22,36 @@ public class TicketCache {
 
     public int addTicket(double lat, double lon, int distance) {
         incrementTicketId();
+        ticketInnerMap.put(countTicketId, new Ticket(countTicketId, lat, lon, distance));
         sql.addTicket(new Ticket(countTicketId, lat, lon, distance));
         return countTicketId;
     }
 
-    public Queue<Ticket> ticketQueue(Ticket ticket) {
-        Queue<Ticket> queue = new PriorityQueue<Ticket>();
-        queue.add(ticket);
-        return queue;
+    public boolean isTicketId(int id){
+        if(ticketInnerMap.containsKey(id)){
+            return false;
+        }
+        else{
+            return true;
+        }
+//        int i = sql.isTicketId(id);
+//        if(i != 0){
+//            return false;
+//        }
+//        else {
+//            return true;
+//        }
     }
+
+//    public Queue<Ticket> ticketQueue(Ticket ticket) {
+//        Queue<Ticket> queue = new PriorityQueue<Ticket>();
+//        queue.add(ticket);
+//        return queue;
+//    }
 
 
     public String deleteTicket(int id) {
+        ticketInnerMap.remove(id);
         sql.deleteTicket(id);
         return "";
     }

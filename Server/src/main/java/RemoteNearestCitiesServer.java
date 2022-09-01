@@ -94,17 +94,22 @@ public class RemoteNearestCitiesServer implements NearestCities{
         return openWeatherMapJsonParser.getReadyForecast(city);
     }
 
-    @Override
-    public Queue<Ticket> ticketQueue(Ticket ticket) throws RemoteException {
-//        Queue<Ticket> queue = new PriorityQueue<Ticket>();
-//        queue.add(ticket);
-        return ticketCache.ticketQueue(ticket);
-    }
+//    @Override
+//    public Queue<Ticket> ticketQueue(Ticket ticket) throws RemoteException {
+////        Queue<Ticket> queue = new PriorityQueue<Ticket>();
+////        queue.add(ticket);
+//        return ticketCache.ticketQueue(ticket);
+//    }
 
     @Override
     public String deleteTicket(int id) throws RemoteException {
         ticketCache.deleteTicket(id);
         return "";
+    }
+
+    @Override
+    public boolean isTicketId(int id) throws RemoteException {
+        return ticketCache.isTicketId(id);
     }
 
 //    public void incrementTicketId(){

@@ -12,6 +12,7 @@ public interface NearestCities extends Remote{
     int addTicket(double lat, double lon, int distance) throws RemoteException;
     Map<CityData, Integer> nearestCities(Ticket ticket) throws RemoteException, FileNotFoundException;
     String getReadyForecast(String city) throws RemoteException;
-    Queue<Ticket> ticketQueue(Ticket ticket) throws RemoteException;
+//    Queue<Ticket> ticketQueue(Ticket ticket) throws RemoteException;
     String deleteTicket(int id) throws RemoteException;
+    boolean isTicketId(int id) throws RemoteException;
 }
