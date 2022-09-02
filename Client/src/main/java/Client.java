@@ -13,6 +13,7 @@ public class Client {
     static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
     static Registry registry;
     static NearestCities nearestCities;
+    static List<Integer> taskList = new LinkedList<>();
 //    static Queue<Ticket> queue;
     static Ticket ticket;
 //    static boolean check = false;
@@ -54,6 +55,7 @@ public class Client {
             task = nearestCities.addTicket(lat, lon, distance);
             ticket = new Ticket(task, lat, lon, distance);
             System.out.println("your ticket is №" + task);
+            taskList.add(ticket.getId());
 //            queue = nearestCities.ticketQueue(ticket);
 //            nearestCities(ticket);
         }
@@ -66,6 +68,7 @@ public class Client {
             task = nearestCities.addTicket(lat, lon, distance);
             ticket = new Ticket(task, lat, lon, distance);
             System.out.println("your ticket is №" + task);
+            taskList.add(ticket.getId());
 //            queue = nearestCities.ticketQueue(ticket);
 //            nearestCities(ticket);
         }else{
@@ -77,11 +80,19 @@ public class Client {
                 try {
                     Thread.sleep(3000);
 //                    nearestCities(ticket);
-                    boolean check = nearestCities.isTicketId(ticket.getId());
-                    if (!check){
-                        nearestCities(ticket);
-                        nearestCities.deleteTicket(ticket.getId());
+                    for(Integer i : taskList){
+                        boolean check = nearestCities.isTicketId(i);
+                        if (!check){
+                            nearestCities(ticket);
+                            nearestCities.deleteTicket(i);
+                            taskList.remove(i);
+                        }
                     }
+//                    boolean check = nearestCities.isTicketId(ticket.getId());
+//                    if (!check){
+//                        nearestCities(ticket);
+//                        nearestCities.deleteTicket(ticket.getId());
+//                    }
 
 //                    for(Ticket t : queue){
 //                        Thread.sleep(3000);
