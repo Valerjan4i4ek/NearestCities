@@ -43,11 +43,14 @@ public class TicketCache {
 //        }
     }
 
-//    public Queue<Ticket> ticketQueue(Ticket ticket) {
-//        Queue<Ticket> queue = new PriorityQueue<Ticket>();
-//        queue.add(ticket);
-//        return queue;
-//    }
+    public Queue<Ticket> ticketQueue() {
+        Queue<Ticket> queue = new PriorityQueue<Ticket>();
+        for(Map.Entry<Integer, Ticket> entry : ticketInnerMap.entrySet()){
+            queue.add(entry.getValue());
+        }
+
+        return queue;
+    }
 
 
     public String deleteTicket(int id) {

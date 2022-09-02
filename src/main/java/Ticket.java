@@ -1,6 +1,6 @@
 import java.io.Serializable;
 
-public class Ticket implements Serializable {
+public class Ticket implements Serializable, Comparable<Ticket> {
     private int id;
     private double lat;
     private double lon;
@@ -43,5 +43,10 @@ public class Ticket implements Serializable {
 
     public void setDistance(int distance) {
         this.distance = distance;
+    }
+
+    @Override
+    public int compareTo(Ticket o) {
+        return 0;
     }
 }

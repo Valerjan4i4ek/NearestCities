@@ -13,8 +13,8 @@ public class Client {
     static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
     static Registry registry;
     static NearestCities nearestCities;
-    static List<Integer> taskList = new LinkedList<>();
-//    static Queue<Ticket> queue;
+//    static List<Integer> taskList = new LinkedList<>();
+    static Queue<Ticket> queue;
     static Ticket ticket;
 //    static boolean check = false;
 
@@ -55,8 +55,8 @@ public class Client {
             task = nearestCities.addTicket(lat, lon, distance);
             ticket = new Ticket(task, lat, lon, distance);
             System.out.println("your ticket is №" + task);
-            taskList.add(ticket.getId());
-//            queue = nearestCities.ticketQueue(ticket);
+//            taskList.add(ticket.getId());
+            queue = nearestCities.ticketQueue();
 //            nearestCities(ticket);
         }
         else if(cityOrCoordinate.equalsIgnoreCase("k")){
@@ -68,8 +68,8 @@ public class Client {
             task = nearestCities.addTicket(lat, lon, distance);
             ticket = new Ticket(task, lat, lon, distance);
             System.out.println("your ticket is №" + task);
-            taskList.add(ticket.getId());
-//            queue = nearestCities.ticketQueue(ticket);
+//            taskList.add(ticket.getId());
+            queue = nearestCities.ticketQueue();
 //            nearestCities(ticket);
         }else{
             System.out.println("Incorrect :(");
@@ -78,32 +78,34 @@ public class Client {
         new Thread(() -> {
             while (!Thread.currentThread().isInterrupted()){
                 try {
-                    Thread.sleep(3000);
+                    Thread.sleep(10000);
 //                    nearestCities(ticket);
-                    for(Integer i : taskList){
-                        boolean check = nearestCities.isTicketId(i);
-                        if (!check){
-                            nearestCities(ticket);
-                            nearestCities.deleteTicket(i);
-                            taskList.remove(i);
-                        }
-                    }
+//                    for(Integer i : taskList){
+//                        boolean check = nearestCities.isTicketId(i);
+//                        if (!check){
+//                            nearestCities(ticket);
+//                            nearestCities.deleteTicket(i);
+//                            taskList.remove(i);
+//                        }
+//                    }
 //                    boolean check = nearestCities.isTicketId(ticket.getId());
 //                    if (!check){
 //                        nearestCities(ticket);
 //                        nearestCities.deleteTicket(ticket.getId());
 //                    }
+                    for(Ticket t : queue){
+                        synchronized (t){
+                            boolean check = nearestCities.isTicketId(t.getId());
+                            if (!check){
+                                nearestCities(t);
+                                queue.remove(t);
+                                nearestCities.deleteTicket(t.getId());
+                            }
+                        }
 
-//                    for(Ticket t : queue){
-//                        Thread.sleep(3000);
-//                        boolean check = nearestCities.isTicketId(t.getId());
-//                        if (check){
-//                            nearestCities(t);
-//                            queue.remove(t);
-//                            nearestCities.deleteTicket(t.getId());
-//                        }
-//
-//                    }
+                    }
+
+
                 } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
                 }
