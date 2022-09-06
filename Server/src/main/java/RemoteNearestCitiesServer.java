@@ -102,11 +102,11 @@ public class RemoteNearestCitiesServer implements NearestCities{
             for(Map.Entry<Integer, Ticket> entry : ticketMap.entrySet()){
                 map = nearestCitiesCalculate(entry.getValue());
                 chekMap.put(entry.getKey(), map);
+                ticketCache.deleteTicket(clientTicket.getId());
             }
             if(ticketMap.containsKey(clientTicket.getId())){
                 return chekMap.get(clientTicket.getId());
             }
-            ticketCache.deleteTicket(clientTicket.getId());
         }
         return map;
 
