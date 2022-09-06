@@ -1,13 +1,11 @@
-import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class TicketCache {
     MySQLClass sql = new MySQLClass();
     List<Ticket> ticketList = sql.getTicketCache();
     Map<Integer, Ticket> ticketInnerMap = getInnerMapTicketCache(ticketList);
+    Map<Integer, Map<CityData, Integer>> resultsMap = new LinkedHashMap<>();
     List<Integer> listTicketId;
     int countTicketId;
 
@@ -17,6 +15,14 @@ public class TicketCache {
             map.put(ticket.getId(), ticket);
         }
         return map;
+    }
+
+    public Map<Integer, Map<CityData, Integer>> getResults(){
+        return resultsMap;
+    }
+
+    public void addResult(int ticketId, Map<CityData, Integer> map){
+        resultsMap.put(ticketId, map);
     }
 
     public int addTicket(double lat, double lon, int distance) {
@@ -33,13 +39,6 @@ public class TicketCache {
         else{
             return true;
         }
-//        int i = sql.isTicketId(id);
-//        if(i != 0){
-//            return false;
-//        }
-//        else {
-//            return true;
-//        }
     }
 
     public Map<Integer, Ticket> ticketMapQueue(){
