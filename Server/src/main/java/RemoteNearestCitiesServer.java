@@ -55,9 +55,8 @@ public class RemoteNearestCitiesServer implements NearestCities{
     }
 
     @Override
-    public Map<CityData, Integer> nearestCities(Ticket ticket) throws RemoteException, FileNotFoundException {
+    public Map<CityData, Integer> nearestCitiesCalculate(Ticket ticket) throws RemoteException, FileNotFoundException {
         List<CityData> cityDataList = jsonToCityData(JSON_FILE_NAME);
-//        List<CityData> list = new ArrayList<>();
         Map<CityData, Integer> map = new HashMap<>();
         int distance = 0;
         double deltaLat = calculation.computeDelta(ticket.getLat());
@@ -95,10 +94,22 @@ public class RemoteNearestCitiesServer implements NearestCities{
     }
 
     @Override
-    public Queue<Ticket> ticketQueue() throws RemoteException {
-//        Queue<Ticket> queue = new PriorityQueue<Ticket>();
-//        queue.add(ticket);
-        return ticketCache.ticketQueue();
+    public Map<CityData, Integer> nearestCities(Ticket clientTicket) throws RemoteException, FileNotFoundException {
+        Map<Integer, Ticket> ticketMap = ticketCache.ticketMapQueue();
+        Map<CityData, Integer> map = new LinkedHashMap<>();
+        Map<Integer, Map<CityData, Integer>> chekMap = new LinkedHashMap<>();
+        if(ticketMap != null && !ticketMap.isEmpty()){
+            for(Map.Entry<Integer, Ticket> entry : ticketMap.entrySet()){
+                map = nearestCitiesCalculate(entry.getValue());
+                chekMap.put(entry.getKey(), map);
+            }
+            if(ticketMap.containsKey(clientTicket.getId())){
+                return chekMap.get(clientTicket.getId());
+            }
+            ticketCache.deleteTicket(clientTicket.getId());
+        }
+        return map;
+
     }
 
     @Override
@@ -112,14 +123,48 @@ public class RemoteNearestCitiesServer implements NearestCities{
         return ticketCache.isTicketId(id);
     }
 
-//    public void incrementTicketId(){
-//        listTicketId = sql.getTicketId();
-//        if(listTicketId != null && !listTicketId.isEmpty()){
-//            countTicketId = listTicketId.get(listTicketId.size()-1);
-//            countTicketId++;
-//        }
-//        else{
-//            countTicketId++;
-//        }
-//    }
+    @Override
+    public Queue<Ticket> ticketQueue() throws RemoteException {
+        return ticketCache.ticketQueue();
+    }
+
+    @Override
+    public Map<Integer, Ticket> ticketMapQueue() throws RemoteException {
+        return ticketCache.ticketMapQueue();
+    }
+
 }
+
+//    public Map<CityData, Integer> nearestCities2(Ticket clientTicket) throws RemoteException, FileNotFoundException{
+//        Map<Integer, Ticket> ticketMap = ticketCache.ticketMapQueue();
+//        Map<CityData, Integer> map = new LinkedHashMap<>();
+//        Map<Ticket, Map<CityData, Integer>> chekMap = new LinkedHashMap<>();
+//        if(ticketMap != null && !ticketMap.isEmpty()){
+//            for(Map.Entry<Integer, Ticket> entry : ticketMap.entrySet()){
+//                map = nearestCitiesCalculate(entry.getValue());
+//                chekMap.put(entry.getValue(), map);
+//            }
+//            if(ticketMap.containsKey(clientTicket.getId())){
+//                return chekMap.get(clientTicket);
+//            }
+//            ticketCache.deleteTicket(clientTicket.getId());
+//        }
+//        return map;
+//    }
+
+//        Queue<Ticket> queue = ticketCache.ticketQueue();
+//        Map<CityData, Integer> map = new LinkedHashMap<>();
+//        Map<Ticket, Map<CityData, Integer>> chekMap = new LinkedHashMap<>();
+//        if(queue != null && !queue.isEmpty()){
+//            for(Ticket ticket : queue){
+//                map = nearestCitiesCalculate(ticket);
+//                chekMap.put(ticket, map);
+////                ticketCache.deleteTicket(ticket.getId());
+//            }
+//            if(queue.contains(clientTicket)){
+//                return chekMap.get(clientTicket);
+//            }
+//            ticketCache.deleteTicket(clientTicket.getId());
+//        }
+//
+//        return map;

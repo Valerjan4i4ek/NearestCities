@@ -1,4 +1,3 @@
-import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -8,11 +7,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TicketCache {
     MySQLClass sql = new MySQLClass();
     List<Ticket> ticketList = sql.getTicketCache();
-    Map<Integer, Ticket> ticketInnerMap = getInnerMapAuthorization(ticketList);
+    Map<Integer, Ticket> ticketInnerMap = getInnerMapTicketCache(ticketList);
     List<Integer> listTicketId;
     int countTicketId;
 
-    public Map<Integer, Ticket> getInnerMapAuthorization(List<Ticket> list){
+    public Map<Integer, Ticket> getInnerMapTicketCache(List<Ticket> list){
         Map<Integer, Ticket> map = new ConcurrentHashMap<>();
         for(Ticket ticket : list){
             map.put(ticket.getId(), ticket);
@@ -41,6 +40,10 @@ public class TicketCache {
 //        else {
 //            return true;
 //        }
+    }
+
+    public Map<Integer, Ticket> ticketMapQueue(){
+        return ticketInnerMap;
     }
 
     public Queue<Ticket> ticketQueue() {
