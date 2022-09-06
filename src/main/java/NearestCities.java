@@ -12,9 +12,10 @@ public interface NearestCities extends Remote{
     int addTicket(double lat, double lon, int distance) throws RemoteException;
     Map<CityData, Integer> nearestCitiesCalculate(Ticket ticket) throws RemoteException, FileNotFoundException;
     String getReadyForecast(String city) throws RemoteException;
-    Map<CityData, Integer> nearestCities(Ticket clientTicket) throws RemoteException, FileNotFoundException;
+    Map<CityData, Integer> nearestCities(int ticketId) throws RemoteException, FileNotFoundException;
     String deleteTicket(int id) throws RemoteException;
     boolean isTicketId(int id) throws RemoteException;
     Queue<Ticket> ticketQueue() throws RemoteException;
     Map<Integer, Ticket> ticketMapQueue() throws RemoteException;
+    public Map<Integer, Map<CityData, Integer>> ololo() throws RemoteException, FileNotFoundException;
 }

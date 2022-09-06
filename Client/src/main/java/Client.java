@@ -17,6 +17,7 @@ public class Client {
 //    static Queue<Ticket> queue;
     static Map<Integer, Ticket> ticketMapQueue;
     static Ticket ticket;
+
 //    static boolean check = false;
 
     static {
@@ -47,24 +48,20 @@ public class Client {
         new Thread(() -> {
             while (!Thread.currentThread().isInterrupted()){
                 try {
+                    nearestCities.ololo();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+        new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()){
+                try {
                     Thread.sleep(10000);
                     ticketMapQueueInThread();
-//                    for(Ticket t : queue){
-//                        boolean check = nearestCities.isTicketId(t.getId());
-//                        if (check){
-//                            System.out.println("Ticket № " + ticket.getId() + " is not ready yet");
-//
-//                        }
-//                        else {
-//                            nearestCities(t);
-//                            queue.remove(t);
-//                        }
-//                    }
-
                 } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
                 }
-
             }
         }).start();
 
@@ -81,14 +78,9 @@ public class Client {
             distance = Integer.parseInt(reader.readLine());
             task = nearestCities.addTicket(lat, lon, distance);
             ticket = new Ticket(task, lat, lon, distance);
-//            queue = nearestCities.ticketQueue();
             ticketMapQueue = nearestCities.ticketMapQueue();
             System.out.println("your ticket is №" + task);
             letsStart();
-//            ticketQueue();
-//            taskList.add(ticket.getId());
-//            queue = nearestCities.ticketQueue();
-//            nearestCities(ticket);
         }
         else if(cityOrCoordinate.equalsIgnoreCase("k")){
             System.out.println("for example: \"48.0000\" or \"51.00\"");
@@ -98,13 +90,9 @@ public class Client {
             distance = Integer.parseInt(reader.readLine());
             task = nearestCities.addTicket(lat, lon, distance);
             ticket = new Ticket(task, lat, lon, distance);
-//            queue = nearestCities.ticketQueue();
             ticketMapQueue = nearestCities.ticketMapQueue();
             System.out.println("your ticket is №" + task);
             letsStart();
-//            taskList.add(ticket.getId());
-//            ticketQueue();
-//            nearestCities(ticket);
         }else{
             System.out.println("Incorrect :(");
             letsStart();
@@ -119,14 +107,15 @@ public class Client {
                 System.out.println("Ticket № " + entry.getKey() + " is not ready yet");
             }
             else{
-                nearestCities(entry.getValue());
+                nearestCities(entry.getKey());
+                deleteTicket(entry.getKey());
                 ticketMapQueue.remove(entry.getKey());
             }
         }
     }
 
-    public static void nearestCities(Ticket clientTicket) throws FileNotFoundException, RemoteException {
-        Map<CityData, Integer> cityDataMap = nearestCities.nearestCities(clientTicket);
+    public static void nearestCities(int ticketId) throws FileNotFoundException, RemoteException {
+        Map<CityData, Integer> cityDataMap = nearestCities.nearestCities(ticketId);
         if (cityDataMap != null && !cityDataMap.isEmpty()){
             for(Map.Entry<CityData, Integer> entry : cityDataMap.entrySet()){
                 System.out.println(entry.getKey().getName() + " " + entry.getKey().getCountry() + " " + entry.getKey().getState() + " " + entry.getValue());
@@ -136,16 +125,9 @@ public class Client {
         }
     }
 
-//    public static void nearestCities(Ticket ticket) throws FileNotFoundException, RemoteException {
-//        Map<CityData, Integer> cityDataMap = nearestCities.nearestCities(ticket);
-//
-////        TreeMap<CityData, Integer> treeMap = new TreeMap<>(cityDataMap);
-//        for(Map.Entry<CityData, Integer> entry : cityDataMap.entrySet()){
-//            System.out.println(entry.getKey().getName() + " " + entry.getKey().getCountry() + " " + entry.getKey().getState() + " " + entry.getValue());
-//            System.out.println(nearestCities.getReadyForecast(entry.getKey().getName()));
-//            System.out.println();
-//        }
-//    }
+    public static void deleteTicket(int id) throws RemoteException {
+        String s = nearestCities.deleteTicket(id);
+    }
 
     public static String sameNameCitiesCount(String cityName) throws IOException {
         List<CityData> list = nearestCities.sameNameCitiesCount(cityName);

@@ -2,6 +2,7 @@ import com.google.gson.Gson;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -10,10 +11,7 @@ public class RemoteNearestCitiesServer implements NearestCities{
     private final static String JSON_FILE_NAME = "Server/citylist.json";
     OpenWeatherMapJsonParser openWeatherMapJsonParser = new OpenWeatherMapJsonParser();
     TicketCache ticketCache = new TicketCache();
-//    MySQLClass sql = new MySQLClass();
     Calculator calculation = new Calculator();
-//    List<Integer> listTicketId;
-//    int countTicketId;
 
     private static List<CityData> jsonToCityData(String fileName) throws FileNotFoundException {
         return Arrays.asList(new Gson().fromJson(new FileReader(fileName), CityData[].class));
@@ -94,7 +92,22 @@ public class RemoteNearestCitiesServer implements NearestCities{
     }
 
     @Override
-    public Map<CityData, Integer> nearestCities(Ticket clientTicket) throws RemoteException, FileNotFoundException {
+    public Map<CityData, Integer> nearestCities(int ticketId) throws RemoteException, FileNotFoundException {
+        Map<Integer, Map<CityData, Integer>> chekMap = ololo();
+        Map<CityData, Integer> map = new HashMap<>();
+        if(chekMap != null && !chekMap.isEmpty()){
+            if(chekMap.containsKey(ticketId)){
+                map = chekMap.get(ticketId);
+            }
+            else{
+                System.out.println("ololo taska ne gotova");
+            }
+        }
+        return map;
+    }
+
+    @Override
+    public Map<Integer, Map<CityData, Integer>> ololo() throws FileNotFoundException, RemoteException {
         Map<Integer, Ticket> ticketMap = ticketCache.ticketMapQueue();
         Map<CityData, Integer> map = new LinkedHashMap<>();
         Map<Integer, Map<CityData, Integer>> chekMap = new LinkedHashMap<>();
@@ -102,14 +115,9 @@ public class RemoteNearestCitiesServer implements NearestCities{
             for(Map.Entry<Integer, Ticket> entry : ticketMap.entrySet()){
                 map = nearestCitiesCalculate(entry.getValue());
                 chekMap.put(entry.getKey(), map);
-                ticketCache.deleteTicket(clientTicket.getId());
-            }
-            if(ticketMap.containsKey(clientTicket.getId())){
-                return chekMap.get(clientTicket.getId());
             }
         }
-        return map;
-
+        return chekMap;
     }
 
     @Override
@@ -132,7 +140,6 @@ public class RemoteNearestCitiesServer implements NearestCities{
     public Map<Integer, Ticket> ticketMapQueue() throws RemoteException {
         return ticketCache.ticketMapQueue();
     }
-
 }
 
 //    public Map<CityData, Integer> nearestCities2(Ticket clientTicket) throws RemoteException, FileNotFoundException{
