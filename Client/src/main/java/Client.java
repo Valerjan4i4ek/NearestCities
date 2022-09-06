@@ -48,7 +48,7 @@ public class Client {
         new Thread(() -> {
             while (!Thread.currentThread().isInterrupted()){
                 try {
-                    nearestCities.ololo();
+                    nearestCities.calculateInThread();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

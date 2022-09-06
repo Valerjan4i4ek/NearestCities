@@ -17,5 +17,5 @@ public interface NearestCities extends Remote{
     boolean isTicketId(int id) throws RemoteException;
     Queue<Ticket> ticketQueue() throws RemoteException;
     Map<Integer, Ticket> ticketMapQueue() throws RemoteException;
-    public Map<Integer, Map<CityData, Integer>> ololo() throws RemoteException, FileNotFoundException;
+    public Map<Integer, Map<CityData, Integer>> calculateInThread() throws RemoteException, FileNotFoundException;
 }

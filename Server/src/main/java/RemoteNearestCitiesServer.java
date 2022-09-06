@@ -2,7 +2,6 @@ import com.google.gson.Gson;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -93,7 +92,7 @@ public class RemoteNearestCitiesServer implements NearestCities{
 
     @Override
     public Map<CityData, Integer> nearestCities(int ticketId) throws RemoteException, FileNotFoundException {
-        Map<Integer, Map<CityData, Integer>> chekMap = ololo();
+        Map<Integer, Map<CityData, Integer>> chekMap = calculateInThread();
         Map<CityData, Integer> map = new HashMap<>();
         if(chekMap != null && !chekMap.isEmpty()){
             if(chekMap.containsKey(ticketId)){
@@ -107,7 +106,7 @@ public class RemoteNearestCitiesServer implements NearestCities{
     }
 
     @Override
-    public Map<Integer, Map<CityData, Integer>> ololo() throws FileNotFoundException, RemoteException {
+    public Map<Integer, Map<CityData, Integer>> calculateInThread() throws FileNotFoundException, RemoteException {
         Map<Integer, Ticket> ticketMap = ticketCache.ticketMapQueue();
         Map<CityData, Integer> map = new LinkedHashMap<>();
         Map<Integer, Map<CityData, Integer>> chekMap = new LinkedHashMap<>();
