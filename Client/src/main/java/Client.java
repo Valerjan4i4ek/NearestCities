@@ -34,16 +34,6 @@ public class Client {
     }
 
     public static void main(String[] args) throws IOException {
-        letsStart();
-    }
-
-    public static void letsStart() throws IOException {
-        String cityOrCoordinate = "";
-        String cityName = "";
-        int task;
-        double lat;
-        double lon;
-        int distance;
 
         new Thread(() -> {
             while (!Thread.currentThread().isInterrupted()){
@@ -64,6 +54,16 @@ public class Client {
                 }
             }
         }).start();
+        letsStart();
+    }
+
+    public static void letsStart() throws IOException {
+        String cityOrCoordinate = "";
+        String cityName = "";
+        int task;
+        double lat;
+        double lon;
+        int distance;
 
         System.out.println("City name or coordinates? c/k");
         cityOrCoordinate = reader.readLine();
@@ -97,8 +97,28 @@ public class Client {
             System.out.println("Incorrect :(");
             letsStart();
         }
-
+        new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()){
+                try {
+                    nearestCities.calculateInThread();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+        new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()){
+                try {
+                    Thread.sleep(10000);
+                    ticketMapQueueInThread();
+                } catch (IOException | InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+        letsStart();
     }
+
 
     public static void ticketMapQueueInThread() throws RemoteException, FileNotFoundException {
         for(Map.Entry<Integer, Ticket> entry : ticketMapQueue.entrySet()){
