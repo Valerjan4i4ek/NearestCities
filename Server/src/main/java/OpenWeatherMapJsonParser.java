@@ -14,7 +14,7 @@ import java.util.Locale;
 
 public class OpenWeatherMapJsonParser implements WeatherParser{
     private final static String API_CALL_TEMPLATE = "https://api.openweathermap.org/data/2.5/forecast?q=";
-    private final static String API_KEY_TEMPLATE = "&units=metric&APPID=de834929791b3dbe8e75a9cba9eaaf2a";
+    private final static String API_KEY_TEMPLATE = "&units=metric&APPID=70633d4e0b50763c7880ca3f990e304c";
     private final static String USER_AGENT = "Chrome/104.0.0.0";
     private final static DateTimeFormatter INPUT_DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final static DateTimeFormatter OUTPUT_DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("MMM dd", Locale.US);

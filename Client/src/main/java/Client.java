@@ -17,6 +17,7 @@ public class Client {
 //    static Queue<Ticket> queue;
     static Map<Integer, Ticket> ticketMapQueue;
     static Ticket ticket;
+    static List<Integer> personalClientTickets = new LinkedList<>();
 
 //    static boolean check = false;
 
@@ -34,7 +35,6 @@ public class Client {
     }
 
     public static void main(String[] args) throws IOException {
-
         new Thread(() -> {
             while (!Thread.currentThread().isInterrupted()){
                 try {
@@ -54,10 +54,12 @@ public class Client {
                 }
             }
         }).start();
+
         letsStart();
     }
 
     public static void letsStart() throws IOException {
+
         String cityOrCoordinate = "";
         String cityName = "";
         int task;
@@ -78,6 +80,7 @@ public class Client {
             distance = Integer.parseInt(reader.readLine());
             task = nearestCities.addTicket(lat, lon, distance);
             ticket = new Ticket(task, lat, lon, distance);
+            personalClientTickets.add(task);
             ticketMapQueue = nearestCities.ticketMapQueue();
             System.out.println("your ticket is №" + task);
             letsStart();
@@ -90,6 +93,7 @@ public class Client {
             distance = Integer.parseInt(reader.readLine());
             task = nearestCities.addTicket(lat, lon, distance);
             ticket = new Ticket(task, lat, lon, distance);
+            personalClientTickets.add(task);
             ticketMapQueue = nearestCities.ticketMapQueue();
             System.out.println("your ticket is №" + task);
             letsStart();
@@ -97,39 +101,24 @@ public class Client {
             System.out.println("Incorrect :(");
             letsStart();
         }
-        new Thread(() -> {
-            while (!Thread.currentThread().isInterrupted()){
-                try {
-                    nearestCities.calculateInThread();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-        new Thread(() -> {
-            while (!Thread.currentThread().isInterrupted()){
-                try {
-                    Thread.sleep(10000);
-                    ticketMapQueueInThread();
-                } catch (IOException | InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-        letsStart();
+
     }
 
 
     public static void ticketMapQueueInThread() throws RemoteException, FileNotFoundException {
         for(Map.Entry<Integer, Ticket> entry : ticketMapQueue.entrySet()){
             boolean check = nearestCities.isTicketId(entry.getKey());
-            if(check){
-                System.out.println("Ticket № " + entry.getKey() + " is not ready yet");
-            }
-            else{
-                nearestCities(entry.getKey());
-                deleteTicket(entry.getKey());
-                ticketMapQueue.remove(entry.getKey());
+            for(int i : personalClientTickets){
+                if(i == entry.getKey()){
+                    if(check){
+                        System.out.println("Ticket № " + entry.getKey() + " is not ready yet");
+                    }
+                    else{
+                        nearestCities(entry.getKey());
+                        deleteTicket(entry.getKey());
+                        ticketMapQueue.remove(entry.getKey());
+                    }
+                }
             }
         }
     }
