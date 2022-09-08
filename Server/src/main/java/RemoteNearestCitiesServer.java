@@ -60,7 +60,7 @@ public class RemoteNearestCitiesServer implements NearestCities{
         double deltaLon = calculation.computeDelta(ticket.getLon());
         double aroundLat = calculation.around(ticket.getDistance(), deltaLat);
         double aroundLon = calculation.around(ticket.getDistance(), deltaLon);
-        if(!cityDataList.isEmpty()){
+        if(cityDataList != null && !cityDataList.isEmpty()){
             for (CityData cityData : cityDataList){
                 if(cityData.getCoord().getLat() >= ticket.getLat() - aroundLat && cityData.getCoord().getLat() <= ticket.getLat() + aroundLat){
                     if(cityData.getCoord().getLon() >= ticket.getLon() - aroundLon && cityData.getCoord().getLon() <= ticket.getLon() + aroundLon){
@@ -109,12 +109,10 @@ public class RemoteNearestCitiesServer implements NearestCities{
     public String calculateInThread() throws FileNotFoundException, RemoteException {
         Map<Integer, Ticket> ticketMap = ticketCache.ticketMapQueue();
         Map<CityData, Integer> map = new LinkedHashMap<>();
-//        Map<Integer, Map<CityData, Integer>> chekMap = new LinkedHashMap<>();
         if(ticketMap != null && !ticketMap.isEmpty()){
             for(Map.Entry<Integer, Ticket> entry : ticketMap.entrySet()){
                 map = nearestCitiesCalculate(entry.getValue());
                 ticketCache.addMapResults(entry.getKey(), map);
-//                chekMap.put(entry.getKey(), map);
             }
         }
         return "";
