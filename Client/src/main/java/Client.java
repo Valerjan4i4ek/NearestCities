@@ -13,19 +13,14 @@ public class Client {
     static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
     static Registry registry;
     static NearestCities nearestCities;
-//    static List<Integer> taskList = new LinkedList<>();
-//    static Queue<Ticket> queue;
     static Map<Integer, Ticket> ticketMapQueue;
     static Ticket ticket;
     static List<Integer> personalClientTickets = new LinkedList<>();
-
-//    static boolean check = false;
 
     static {
         try {
             registry = LocateRegistry.getRegistry("127.0.0.1", 2732);
             nearestCities = (NearestCities) registry.lookup(UNIQUE_BINDING_NAME);
-//            queue = nearestCities.ticketQueue();
             ticketMapQueue = nearestCities.ticketMapQueue();
         } catch (RemoteException e) {
             e.printStackTrace();
@@ -81,6 +76,7 @@ public class Client {
             task = nearestCities.addTicket(lat, lon, distance);
             ticket = new Ticket(task, lat, lon, distance);
             personalClientTickets.add(task);
+            addListResults(personalClientTickets);
             ticketMapQueue = nearestCities.ticketMapQueue();
             System.out.println("your ticket is №" + task);
             letsStart();
@@ -94,6 +90,7 @@ public class Client {
             task = nearestCities.addTicket(lat, lon, distance);
             ticket = new Ticket(task, lat, lon, distance);
             personalClientTickets.add(task);
+            addListResults(personalClientTickets);
             ticketMapQueue = nearestCities.ticketMapQueue();
             System.out.println("your ticket is №" + task);
             letsStart();
@@ -101,25 +98,23 @@ public class Client {
             System.out.println("Incorrect :(");
             letsStart();
         }
-
     }
 
 
     public static void ticketMapQueueInThread() throws RemoteException, FileNotFoundException {
         for(Map.Entry<Integer, Ticket> entry : ticketMapQueue.entrySet()){
-            boolean check = nearestCities.isTicketId(entry.getKey());
-            for(int i : personalClientTickets){
-                if(i == entry.getKey()){
-                    if(check){
-                        System.out.println("Ticket № " + entry.getKey() + " is not ready yet");
-                    }
-                    else{
-                        nearestCities(entry.getKey());
-                        deleteTicket(entry.getKey());
-                        ticketMapQueue.remove(entry.getKey());
-                    }
+            if(personalClientTickets.contains(entry.getKey())){
+                boolean check = nearestCities.isTicketId(entry.getKey());
+                if(check){
+                    System.out.println("Ticket № " + entry.getKey() + " is not ready yet");
+                }
+                else{
+                    nearestCities(entry.getKey());
+                    deleteTicket(entry.getKey());
+                    ticketMapQueue.remove(entry.getKey());
                 }
             }
+
         }
     }
 
@@ -134,8 +129,12 @@ public class Client {
         }
     }
 
+    public static void addListResults(List<Integer> listTicketId) throws RemoteException {
+        nearestCities.addListResults(listTicketId);
+    }
+
     public static void deleteTicket(int id) throws RemoteException {
-        String s = nearestCities.deleteTicket(id);
+        nearestCities.deleteTicket(id);
     }
 
     public static String sameNameCitiesCount(String cityName) throws IOException {

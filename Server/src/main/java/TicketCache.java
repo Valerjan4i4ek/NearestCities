@@ -6,6 +6,7 @@ public class TicketCache {
     List<Ticket> ticketList = sql.getTicketCache();
     Map<Integer, Ticket> ticketInnerMap = getInnerMapTicketCache(ticketList);
     Map<Integer, Map<CityData, Integer>> resultsMap = new LinkedHashMap<>();
+    List<Integer> resultsList = new LinkedList<>();
     List<Integer> listTicketId;
     int countTicketId;
 
@@ -18,12 +19,30 @@ public class TicketCache {
     }
 
     public Map<Integer, Map<CityData, Integer>> getResults(){
-        return resultsMap;
+        Map<Integer, Map<CityData, Integer>> map = new LinkedHashMap<>();
+        for(Integer i : resultsList){
+            if(ticketInnerMap.containsKey(i)){
+                map.put(i, resultsMap.get(i));
+            }
+//            else{
+//                System.out.println("another client task or no task");
+//            }
+        }
+        return map;
     }
 
-    public void addResult(int ticketId, Map<CityData, Integer> map){
+    public void addListResults(List<Integer> listTicketId){
+        resultsList.addAll(listTicketId);
+    }
+
+    public void addMapResults(int ticketId, Map<CityData, Integer> map){
         resultsMap.put(ticketId, map);
     }
+
+    public Map<Integer, Ticket> ticketMapQueue(){
+        return ticketInnerMap;
+    }
+
 
     public int addTicket(double lat, double lon, int distance) {
         incrementTicketId();
@@ -40,25 +59,23 @@ public class TicketCache {
             return true;
         }
     }
+//    public Queue<Ticket> ticketQueue() {
+//        Queue<Ticket> queue = new PriorityQueue<Ticket>();
+//        for(Map.Entry<Integer, Ticket> entry : ticketInnerMap.entrySet()){
+//            queue.add(entry.getValue());
+//        }
+//
+//        return queue;
+//    }
 
-    public Map<Integer, Ticket> ticketMapQueue(){
-        return ticketInnerMap;
-    }
 
-    public Queue<Ticket> ticketQueue() {
-        Queue<Ticket> queue = new PriorityQueue<Ticket>();
-        for(Map.Entry<Integer, Ticket> entry : ticketInnerMap.entrySet()){
-            queue.add(entry.getValue());
+    public void deleteTicket(int id) {
+        if(ticketInnerMap.containsKey(id) && resultsMap.containsKey(id)){
+            ticketInnerMap.remove(id);
+            resultsMap.remove(id);
+//            resultsList.remove(id);
+            sql.deleteTicket(id);
         }
-
-        return queue;
-    }
-
-
-    public String deleteTicket(int id) {
-        ticketInnerMap.remove(id);
-        sql.deleteTicket(id);
-        return "";
     }
 
     public void incrementTicketId(){

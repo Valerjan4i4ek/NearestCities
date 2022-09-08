@@ -75,7 +75,7 @@ public class RemoteNearestCitiesServer implements NearestCities{
         TreeMap<CityData, Integer> treeMap = new TreeMap<>(map);
         map = treeMap;
         Map<CityData, Integer> returnMap = map.entrySet().stream()
-                .sorted(Map.Entry.<CityData, Integer>comparingByValue().reversed())
+                .sorted(Map.Entry.<CityData, Integer>comparingByValue())
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         Map.Entry::getValue,
@@ -113,10 +113,16 @@ public class RemoteNearestCitiesServer implements NearestCities{
         if(ticketMap != null && !ticketMap.isEmpty()){
             for(Map.Entry<Integer, Ticket> entry : ticketMap.entrySet()){
                 map = nearestCitiesCalculate(entry.getValue());
-                ticketCache.addResult(entry.getKey(), map);
+                ticketCache.addMapResults(entry.getKey(), map);
 //                chekMap.put(entry.getKey(), map);
             }
         }
+        return "";
+    }
+
+    @Override
+    public String addListResults(List<Integer> listTicketId) throws RemoteException{
+        ticketCache.addListResults(listTicketId);
         return "";
     }
 
@@ -131,10 +137,10 @@ public class RemoteNearestCitiesServer implements NearestCities{
         return ticketCache.isTicketId(id);
     }
 
-    @Override
-    public Queue<Ticket> ticketQueue() throws RemoteException {
-        return ticketCache.ticketQueue();
-    }
+//    @Override
+//    public Queue<Ticket> ticketQueue(int ticketId) throws RemoteException {
+//        return ticketCache.ticketQueue(ticketId);
+//    }
 
     @Override
     public Map<Integer, Ticket> ticketMapQueue() throws RemoteException {
