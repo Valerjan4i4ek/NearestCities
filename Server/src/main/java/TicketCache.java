@@ -39,8 +39,21 @@ public class TicketCache {
         resultsMap.put(ticketId, map);
     }
 
-    public Map<Integer, Ticket> ticketMapQueue(){
-        return ticketInnerMap;
+    public Map<Integer, Ticket> ticketMapQueue(List<Integer> ticketList){
+        Map<Integer, Ticket> map = new LinkedHashMap<>();
+        if(ticketList != null && !ticketList.isEmpty()){
+            for(int i : ticketList){
+                if(ticketInnerMap.containsKey(i)){
+                    map.put(i, ticketInnerMap.get(i));
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return map;
     }
 
 

@@ -106,8 +106,8 @@ public class RemoteNearestCitiesServer implements NearestCities{
     }
 
     @Override
-    public String calculateInThread() throws FileNotFoundException, RemoteException {
-        Map<Integer, Ticket> ticketMap = ticketCache.ticketMapQueue();
+    public String calculateInThread(List<Integer> ticketList) throws FileNotFoundException, RemoteException {
+        Map<Integer, Ticket> ticketMap = ticketCache.ticketMapQueue(ticketList);
         Map<CityData, Integer> map = new LinkedHashMap<>();
         if(ticketMap != null && !ticketMap.isEmpty()){
             for(Map.Entry<Integer, Ticket> entry : ticketMap.entrySet()){
@@ -141,8 +141,8 @@ public class RemoteNearestCitiesServer implements NearestCities{
 //    }
 
     @Override
-    public Map<Integer, Ticket> ticketMapQueue() throws RemoteException {
-        return ticketCache.ticketMapQueue();
+    public Map<Integer, Ticket> ticketMapQueue(List<Integer> ticketList) throws RemoteException {
+        return ticketCache.ticketMapQueue(ticketList);
     }
 }
 

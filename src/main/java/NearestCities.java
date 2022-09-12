@@ -16,7 +16,7 @@ public interface NearestCities extends Remote{
     String deleteTicket(int id) throws RemoteException;
     boolean isTicketId(int id) throws RemoteException;
 //    Queue<Ticket> ticketQueue() throws RemoteException;
-    Map<Integer, Ticket> ticketMapQueue() throws RemoteException;
-    String calculateInThread() throws RemoteException, FileNotFoundException;
+    Map<Integer, Ticket> ticketMapQueue(List<Integer> ticketList) throws RemoteException;
+    String calculateInThread(List<Integer> ticketList) throws RemoteException, FileNotFoundException;
     String addListResults(List<Integer> listTicketId) throws RemoteException;
 }

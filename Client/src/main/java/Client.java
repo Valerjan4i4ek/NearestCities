@@ -49,7 +49,7 @@ public class Client {
             try {
                 registry = LocateRegistry.getRegistry("127.0.0.1", 2732);
                 nearestCities = (NearestCities) registry.lookup(UNIQUE_BINDING_NAME);
-                ticketMapQueue = nearestCities.ticketMapQueue();
+                ticketMapQueue = nearestCities.ticketMapQueue(personalClientTickets);
                 ticketMapQueueInThread();
 
                 connect = true;
@@ -75,7 +75,7 @@ public class Client {
         try {
             registry = LocateRegistry.getRegistry("127.0.0.1", 2732);
             nearestCities = (NearestCities) registry.lookup(UNIQUE_BINDING_NAME);
-            ticketMapQueue = nearestCities.ticketMapQueue();
+            ticketMapQueue = nearestCities.ticketMapQueue(personalClientTickets);
         } catch (RemoteException e) {
 //            e.printStackTrace();
         } catch (NotBoundException e) {
@@ -100,7 +100,7 @@ public class Client {
             while (!Thread.currentThread().isInterrupted()){
                 if(nearestCities != null){
                     try {
-                        nearestCities.calculateInThread();
+                        nearestCities.calculateInThread(personalClientTickets);
                     } catch (RemoteException e) {
 //                        e.printStackTrace();
                     } catch (FileNotFoundException e) {
@@ -138,7 +138,7 @@ public class Client {
             ticket = new Ticket(task, lat, lon, distance);
             personalClientTickets.add(task);
             addListResults(personalClientTickets);
-            ticketMapQueue = nearestCities.ticketMapQueue();
+            ticketMapQueue = nearestCities.ticketMapQueue(personalClientTickets);
             System.out.println("your ticket is №" + task);
             letsStart();
         }
@@ -152,7 +152,7 @@ public class Client {
             ticket = new Ticket(task, lat, lon, distance);
             personalClientTickets.add(task);
             addListResults(personalClientTickets);
-            ticketMapQueue = nearestCities.ticketMapQueue();
+            ticketMapQueue = nearestCities.ticketMapQueue(personalClientTickets);
             System.out.println("your ticket is №" + task);
             letsStart();
         }else{
