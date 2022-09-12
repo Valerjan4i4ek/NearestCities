@@ -118,11 +118,11 @@ public class RemoteNearestCitiesServer implements NearestCities{
         return "";
     }
 
-    @Override
-    public String addListResults(List<Integer> listTicketId) throws RemoteException{
-        ticketCache.addListResults(listTicketId);
-        return "";
-    }
+//    @Override
+//    public String addListResults(List<Integer> listTicketId) throws RemoteException{
+//        ticketCache.addListResults(listTicketId);
+//        return "";
+//    }
 
     @Override
     public String deleteTicket(int id) throws RemoteException {

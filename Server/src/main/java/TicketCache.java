@@ -41,6 +41,7 @@ public class TicketCache {
 
     public Map<Integer, Ticket> ticketMapQueue(List<Integer> ticketList){
         Map<Integer, Ticket> map = new LinkedHashMap<>();
+        addListResults(ticketList);
         if(ticketList != null && !ticketList.isEmpty()){
             for(int i : ticketList){
                 if(ticketInnerMap.containsKey(i)){

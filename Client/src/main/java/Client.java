@@ -137,8 +137,8 @@ public class Client {
             task = nearestCities.addTicket(lat, lon, distance);
             ticket = new Ticket(task, lat, lon, distance);
             personalClientTickets.add(task);
-            addListResults(personalClientTickets);
-            ticketMapQueue = nearestCities.ticketMapQueue(personalClientTickets);
+//            addListResults(personalClientTickets);
+//            ticketMapQueue = nearestCities.ticketMapQueue(personalClientTickets);
             System.out.println("your ticket is №" + task);
             letsStart();
         }
@@ -151,8 +151,8 @@ public class Client {
             task = nearestCities.addTicket(lat, lon, distance);
             ticket = new Ticket(task, lat, lon, distance);
             personalClientTickets.add(task);
-            addListResults(personalClientTickets);
-            ticketMapQueue = nearestCities.ticketMapQueue(personalClientTickets);
+//            addListResults(personalClientTickets);
+//            ticketMapQueue = nearestCities.ticketMapQueue(personalClientTickets);
             System.out.println("your ticket is №" + task);
             letsStart();
         }else{
@@ -193,9 +193,9 @@ public class Client {
         }
     }
 
-    public static void addListResults(List<Integer> listTicketId) throws RemoteException {
-        nearestCities.addListResults(listTicketId);
-    }
+//    public static void addListResults(List<Integer> listTicketId) throws RemoteException {
+//        nearestCities.addListResults(listTicketId);
+//    }
 
     public static void deleteTicket(int id) throws RemoteException {
         nearestCities.deleteTicket(id);
