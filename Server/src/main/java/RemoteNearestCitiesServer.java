@@ -11,6 +11,12 @@ public class RemoteNearestCitiesServer implements NearestCities{
     OpenWeatherMapJsonParser openWeatherMapJsonParser = new OpenWeatherMapJsonParser();
     TicketCache ticketCache = new TicketCache();
     Calculator calculation = new Calculator();
+    MyThread myThread = new MyThread();
+
+    public RemoteNearestCitiesServer(){
+        myThread.start();
+    }
+
 
     private static List<CityData> jsonToCityData(String fileName) throws FileNotFoundException {
         return Arrays.asList(new Gson().fromJson(new FileReader(fileName), CityData[].class));
@@ -51,39 +57,58 @@ public class RemoteNearestCitiesServer implements NearestCities{
         return ticketCache.addTicket(lat, lon, distance);
     }
 
-    @Override
-    public Map<CityData, Integer> nearestCitiesCalculate(Ticket ticket) throws RemoteException, FileNotFoundException {
-        List<CityData> cityDataList = jsonToCityData(JSON_FILE_NAME);
-        Map<CityData, Integer> map = new HashMap<>();
-        int distance = 0;
-        double deltaLat = calculation.computeDelta(ticket.getLat());
-        double deltaLon = calculation.computeDelta(ticket.getLon());
-        double aroundLat = calculation.around(ticket.getDistance(), deltaLat);
-        double aroundLon = calculation.around(ticket.getDistance(), deltaLon);
-        if(cityDataList != null && !cityDataList.isEmpty()){
-            for (CityData cityData : cityDataList){
-                if(cityData.getCoord().getLat() >= ticket.getLat() - aroundLat && cityData.getCoord().getLat() <= ticket.getLat() + aroundLat){
-                    if(cityData.getCoord().getLon() >= ticket.getLon() - aroundLon && cityData.getCoord().getLon() <= ticket.getLon() + aroundLon){
-                        if(calculation.distanceBetweenCoordinate(ticket.getLat(), ticket.getLon(), cityData.getCoord().getLat(), cityData.getCoord().getLon())*1000 <= ticket.getDistance()){
-                            distance = /*ticket.getDistance() - */(int) calculation.distanceBetweenCoordinate(ticket.getLat(), ticket.getLon(), cityData.getCoord().getLat(), cityData.getCoord().getLon());
-                            map.put(cityData, distance);
-                        }
-                    }
-                }
-            }
-        }
-        TreeMap<CityData, Integer> treeMap = new TreeMap<>(map);
-        map = treeMap;
-        Map<CityData, Integer> returnMap = map.entrySet().stream()
-                .sorted(Map.Entry.<CityData, Integer>comparingByValue())
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        (a, b) -> a,
-                        LinkedHashMap::new
-                ));
-        return returnMap;
-    }
+//    public Map<CityData, Integer> nearestCitiesCalculate(Ticket ticket) throws RemoteException, FileNotFoundException {
+//        List<CityData> cityDataList = jsonToCityData(JSON_FILE_NAME);
+//        Map<CityData, Integer> map = new HashMap<>();
+//        int distance = 0;
+//        double deltaLat = calculation.computeDelta(ticket.getLat());
+//        double deltaLon = calculation.computeDelta(ticket.getLon());
+//        double aroundLat = calculation.around(ticket.getDistance(), deltaLat);
+//        double aroundLon = calculation.around(ticket.getDistance(), deltaLon);
+//        if(cityDataList != null && !cityDataList.isEmpty()){
+//            for (CityData cityData : cityDataList){
+//                if(cityData.getCoord().getLat() >= ticket.getLat() - aroundLat && cityData.getCoord().getLat() <= ticket.getLat() + aroundLat){
+//                    if(cityData.getCoord().getLon() >= ticket.getLon() - aroundLon && cityData.getCoord().getLon() <= ticket.getLon() + aroundLon){
+//                        if(calculation.distanceBetweenCoordinate(ticket.getLat(), ticket.getLon(), cityData.getCoord().getLat(), cityData.getCoord().getLon())*1000 <= ticket.getDistance()){
+//                            distance = /*ticket.getDistance() - */(int) calculation.distanceBetweenCoordinate(ticket.getLat(), ticket.getLon(), cityData.getCoord().getLat(), cityData.getCoord().getLon());
+//                            map.put(cityData, distance);
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        TreeMap<CityData, Integer> treeMap = new TreeMap<>(map);
+//        map = treeMap;
+//        Map<CityData, Integer> returnMap = map.entrySet().stream()
+//                .sorted(Map.Entry.<CityData, Integer>comparingByValue())
+//                .collect(Collectors.toMap(
+//                        Map.Entry::getKey,
+//                        Map.Entry::getValue,
+//                        (a, b) -> a,
+//                        LinkedHashMap::new
+//                ));
+//        return returnMap;
+//    }
+
+//    @Override
+//    public String calculateInThread(List<Integer> ticketList) throws FileNotFoundException, RemoteException {
+//        Map<Integer, Ticket> ticketMap = ticketCache.ticketMapQueue(ticketList);
+//        Map<CityData, Integer> map = new LinkedHashMap<>();
+//        if(ticketMap != null && !ticketMap.isEmpty()){
+//            for(Map.Entry<Integer, Ticket> entry : ticketMap.entrySet()){
+//                try {
+//                    map = nearestCitiesCalculate(entry.getValue());
+//                } catch (RemoteException e) {
+//                    e.printStackTrace();
+//                } catch (FileNotFoundException e) {
+//                    e.printStackTrace();
+//                }
+//                ticketCache.addMapResults(entry.getKey(), map);
+//            }
+//        }
+//
+//        return "";
+//    }
 
     @Override
     public String getReadyForecast(String city) throws RemoteException {
@@ -98,31 +123,9 @@ public class RemoteNearestCitiesServer implements NearestCities{
             if(chekMap.containsKey(ticketId)){
                 map = chekMap.get(ticketId);
             }
-            else{
-                System.out.println("ololo taska ne gotova");
-            }
         }
         return map;
     }
-
-    @Override
-    public String calculateInThread(List<Integer> ticketList) throws FileNotFoundException, RemoteException {
-        Map<Integer, Ticket> ticketMap = ticketCache.ticketMapQueue(ticketList);
-        Map<CityData, Integer> map = new LinkedHashMap<>();
-        if(ticketMap != null && !ticketMap.isEmpty()){
-            for(Map.Entry<Integer, Ticket> entry : ticketMap.entrySet()){
-                map = nearestCitiesCalculate(entry.getValue());
-                ticketCache.addMapResults(entry.getKey(), map);
-            }
-        }
-        return "";
-    }
-
-//    @Override
-//    public String addListResults(List<Integer> listTicketId) throws RemoteException{
-//        ticketCache.addListResults(listTicketId);
-//        return "";
-//    }
 
     @Override
     public String deleteTicket(int id) throws RemoteException {
@@ -135,47 +138,9 @@ public class RemoteNearestCitiesServer implements NearestCities{
         return ticketCache.isTicketId(id);
     }
 
-//    @Override
-//    public Queue<Ticket> ticketQueue(int ticketId) throws RemoteException {
-//        return ticketCache.ticketQueue(ticketId);
-//    }
-
     @Override
     public Map<Integer, Ticket> ticketMapQueue(List<Integer> ticketList) throws RemoteException {
         return ticketCache.ticketMapQueue(ticketList);
     }
 }
 
-//    public Map<CityData, Integer> nearestCities2(Ticket clientTicket) throws RemoteException, FileNotFoundException{
-//        Map<Integer, Ticket> ticketMap = ticketCache.ticketMapQueue();
-//        Map<CityData, Integer> map = new LinkedHashMap<>();
-//        Map<Ticket, Map<CityData, Integer>> chekMap = new LinkedHashMap<>();
-//        if(ticketMap != null && !ticketMap.isEmpty()){
-//            for(Map.Entry<Integer, Ticket> entry : ticketMap.entrySet()){
-//                map = nearestCitiesCalculate(entry.getValue());
-//                chekMap.put(entry.getValue(), map);
-//            }
-//            if(ticketMap.containsKey(clientTicket.getId())){
-//                return chekMap.get(clientTicket);
-//            }
-//            ticketCache.deleteTicket(clientTicket.getId());
-//        }
-//        return map;
-//    }
-
-//        Queue<Ticket> queue = ticketCache.ticketQueue();
-//        Map<CityData, Integer> map = new LinkedHashMap<>();
-//        Map<Ticket, Map<CityData, Integer>> chekMap = new LinkedHashMap<>();
-//        if(queue != null && !queue.isEmpty()){
-//            for(Ticket ticket : queue){
-//                map = nearestCitiesCalculate(ticket);
-//                chekMap.put(ticket, map);
-////                ticketCache.deleteTicket(ticket.getId());
-//            }
-//            if(queue.contains(clientTicket)){
-//                return chekMap.get(clientTicket);
-//            }
-//            ticketCache.deleteTicket(clientTicket.getId());
-//        }
-//
-//        return map;

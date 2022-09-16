@@ -69,8 +69,6 @@ public class Client {
         }
     }
 
-
-
     static {
         try {
             registry = LocateRegistry.getRegistry("127.0.0.1", 2732);
@@ -87,25 +85,18 @@ public class Client {
 
         new Thread(() -> {
             while (!Thread.currentThread().isInterrupted()){
-                try {
-                    Thread.sleep(10000);
-                    reconnectTicketMapQueueInThread();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                reconnectTicketMapQueueInThread();
             }
         }).start();
 
         new Thread(() -> {
             while (!Thread.currentThread().isInterrupted()){
-                if(nearestCities != null){
-                    try {
-                        nearestCities.calculateInThread(personalClientTickets);
-                    } catch (RemoteException e) {
+                try {
+                    ticketMapQueueInThread();
+                } catch (RemoteException e) {
 //                        e.printStackTrace();
-                    } catch (FileNotFoundException e) {
+                } catch (FileNotFoundException e) {
 //                        e.printStackTrace();
-                    }
                 }
             }
         }).start();
@@ -137,8 +128,6 @@ public class Client {
             task = nearestCities.addTicket(lat, lon, distance);
             ticket = new Ticket(task, lat, lon, distance);
             personalClientTickets.add(task);
-//            addListResults(personalClientTickets);
-//            ticketMapQueue = nearestCities.ticketMapQueue(personalClientTickets);
             System.out.println("your ticket is №" + task);
             letsStart();
         }
@@ -151,31 +140,40 @@ public class Client {
             task = nearestCities.addTicket(lat, lon, distance);
             ticket = new Ticket(task, lat, lon, distance);
             personalClientTickets.add(task);
-//            addListResults(personalClientTickets);
-//            ticketMapQueue = nearestCities.ticketMapQueue(personalClientTickets);
             System.out.println("your ticket is №" + task);
             letsStart();
         }else{
             System.out.println("Incorrect :(");
             letsStart();
         }
+
+
     }
 
 
     public static void ticketMapQueueInThread() throws RemoteException, FileNotFoundException {
         if(ticketMapQueue != null && !ticketMapQueue.isEmpty()){
             for(Map.Entry<Integer, Ticket> entry : ticketMapQueue.entrySet()){
-                if(personalClientTickets.contains(entry.getKey())){
-                    boolean check = nearestCities.isTicketId(entry.getKey());
-                    if(check){
-                        System.out.println("Ticket № " + entry.getKey() + " is not ready yet");
-                    }
-                    else{
-                        nearestCities(entry.getKey());
-                        deleteTicket(entry.getKey());
-                        ticketMapQueue.remove(entry.getKey());
-                    }
+                boolean check = nearestCities.isTicketId(entry.getKey());
+                if(check){
+                    System.out.println("Ticket № " + entry.getKey() + " is not ready yet");
                 }
+                else{
+                    nearestCities(entry.getKey());
+                    deleteTicket(entry.getKey());
+                    ticketMapQueue.remove(entry.getKey());
+                }
+//                if(personalClientTickets.contains(entry.getKey())){
+//                    boolean check = nearestCities.isTicketId(entry.getKey());
+//                    if(check){
+//                        System.out.println("Ticket № " + entry.getKey() + " is not ready yet");
+//                    }
+//                    else{
+//                        nearestCities(entry.getKey());
+//                        deleteTicket(entry.getKey());
+//                        ticketMapQueue.remove(entry.getKey());
+//                    }
+//                }
 
             }
         }
@@ -193,9 +191,7 @@ public class Client {
         }
     }
 
-//    public static void addListResults(List<Integer> listTicketId) throws RemoteException {
-//        nearestCities.addListResults(listTicketId);
-//    }
+
 
     public static void deleteTicket(int id) throws RemoteException {
         nearestCities.deleteTicket(id);

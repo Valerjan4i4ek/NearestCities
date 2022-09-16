@@ -39,6 +39,24 @@ public class TicketCache {
         resultsMap.put(ticketId, map);
     }
 
+    public Map<Integer, Ticket> ticketMapQueueWithoutArgs(){
+        Map<Integer, Ticket> map = new LinkedHashMap<>();
+
+        if(resultsList != null && !resultsList.isEmpty()){
+            for(int i : resultsList){
+                if(ticketInnerMap.containsKey(i)){
+                    map.put(i, ticketInnerMap.get(i));
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return map;
+    }
+
     public Map<Integer, Ticket> ticketMapQueue(List<Integer> ticketList){
         Map<Integer, Ticket> map = new LinkedHashMap<>();
         addListResults(ticketList);
@@ -73,15 +91,6 @@ public class TicketCache {
             return true;
         }
     }
-//    public Queue<Ticket> ticketQueue() {
-//        Queue<Ticket> queue = new PriorityQueue<Ticket>();
-//        for(Map.Entry<Integer, Ticket> entry : ticketInnerMap.entrySet()){
-//            queue.add(entry.getValue());
-//        }
-//
-//        return queue;
-//    }
-
 
     public void deleteTicket(int id) {
         if(ticketInnerMap.containsKey(id) && resultsMap.containsKey(id)){
