@@ -8,8 +8,13 @@ import java.util.stream.Collectors;
 
 public class MyThread extends Thread{
     private final static String JSON_FILE_NAME = "Server/citylist.json";
+    private TicketCache ticketCache;
     Calculator calculation = new Calculator();
-    TicketCache ticketCache = new TicketCache();
+//    TicketCache ticketCache = new TicketCache();
+
+    public MyThread(TicketCache ticketCache){
+        this.ticketCache = ticketCache;
+    }
 
 
     private static List<CityData> jsonToCityData(String fileName) throws FileNotFoundException {

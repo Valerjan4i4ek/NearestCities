@@ -10,8 +10,7 @@ public class RemoteNearestCitiesServer implements NearestCities{
     private final static String JSON_FILE_NAME = "Server/citylist.json";
     OpenWeatherMapJsonParser openWeatherMapJsonParser = new OpenWeatherMapJsonParser();
     TicketCache ticketCache = new TicketCache();
-    Calculator calculation = new Calculator();
-    MyThread myThread = new MyThread();
+    MyThread myThread = new MyThread(ticketCache);
 
     public RemoteNearestCitiesServer(){
         myThread.start();
@@ -52,63 +51,8 @@ public class RemoteNearestCitiesServer implements NearestCities{
 
     @Override
     public int addTicket(double lat, double lon, int distance) throws RemoteException {
-//        incrementTicketId();
-//        sql.addTicket(new Ticket(countTicketId, lat, lon, distance));
         return ticketCache.addTicket(lat, lon, distance);
     }
-
-//    public Map<CityData, Integer> nearestCitiesCalculate(Ticket ticket) throws RemoteException, FileNotFoundException {
-//        List<CityData> cityDataList = jsonToCityData(JSON_FILE_NAME);
-//        Map<CityData, Integer> map = new HashMap<>();
-//        int distance = 0;
-//        double deltaLat = calculation.computeDelta(ticket.getLat());
-//        double deltaLon = calculation.computeDelta(ticket.getLon());
-//        double aroundLat = calculation.around(ticket.getDistance(), deltaLat);
-//        double aroundLon = calculation.around(ticket.getDistance(), deltaLon);
-//        if(cityDataList != null && !cityDataList.isEmpty()){
-//            for (CityData cityData : cityDataList){
-//                if(cityData.getCoord().getLat() >= ticket.getLat() - aroundLat && cityData.getCoord().getLat() <= ticket.getLat() + aroundLat){
-//                    if(cityData.getCoord().getLon() >= ticket.getLon() - aroundLon && cityData.getCoord().getLon() <= ticket.getLon() + aroundLon){
-//                        if(calculation.distanceBetweenCoordinate(ticket.getLat(), ticket.getLon(), cityData.getCoord().getLat(), cityData.getCoord().getLon())*1000 <= ticket.getDistance()){
-//                            distance = /*ticket.getDistance() - */(int) calculation.distanceBetweenCoordinate(ticket.getLat(), ticket.getLon(), cityData.getCoord().getLat(), cityData.getCoord().getLon());
-//                            map.put(cityData, distance);
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        TreeMap<CityData, Integer> treeMap = new TreeMap<>(map);
-//        map = treeMap;
-//        Map<CityData, Integer> returnMap = map.entrySet().stream()
-//                .sorted(Map.Entry.<CityData, Integer>comparingByValue())
-//                .collect(Collectors.toMap(
-//                        Map.Entry::getKey,
-//                        Map.Entry::getValue,
-//                        (a, b) -> a,
-//                        LinkedHashMap::new
-//                ));
-//        return returnMap;
-//    }
-
-//    @Override
-//    public String calculateInThread(List<Integer> ticketList) throws FileNotFoundException, RemoteException {
-//        Map<Integer, Ticket> ticketMap = ticketCache.ticketMapQueue(ticketList);
-//        Map<CityData, Integer> map = new LinkedHashMap<>();
-//        if(ticketMap != null && !ticketMap.isEmpty()){
-//            for(Map.Entry<Integer, Ticket> entry : ticketMap.entrySet()){
-//                try {
-//                    map = nearestCitiesCalculate(entry.getValue());
-//                } catch (RemoteException e) {
-//                    e.printStackTrace();
-//                } catch (FileNotFoundException e) {
-//                    e.printStackTrace();
-//                }
-//                ticketCache.addMapResults(entry.getKey(), map);
-//            }
-//        }
-//
-//        return "";
-//    }
 
     @Override
     public String getReadyForecast(String city) throws RemoteException {
