@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 public class MyThread extends Thread{
     private final static String JSON_FILE_NAME = "Server/citylist.json";
-    private TicketCache ticketCache;
+    private final TicketCache ticketCache;
     Calculator calculation = new Calculator();
 //    TicketCache ticketCache = new TicketCache();
 
@@ -35,6 +35,7 @@ public class MyThread extends Thread{
                     e.printStackTrace();
                 }
                 ticketCache.addMapResults(entry.getKey(), map);
+                ticketCache.deleteTicket(entry.getKey());
             }
         }
     }

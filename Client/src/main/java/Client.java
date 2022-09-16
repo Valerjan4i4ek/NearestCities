@@ -17,32 +17,7 @@ public class Client {
     static Ticket ticket;
     static List<Integer> personalClientTickets = new LinkedList<>();
 
-//    public static boolean reconnectIsTicketID() {
-//        boolean connect = false;
-//        while (!connect) {
-//            try {
-//                registry = LocateRegistry.getRegistry("127.0.0.1", 2732);
-//                nearestCities = (NearestCities) registry.lookup(UNIQUE_BINDING_NAME);
-////                ticketMapQueue = nearestCities.ticketMapQueue();
-//
-//
-//                connect = true;
-//            }catch (RemoteException e) {
-//                e.printStackTrace();
-//            } catch (NotBoundException e) {
-//                e.printStackTrace();
-//            } catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//            }
-//            if (!connect) {
-//                try {
-//                    Thread.sleep(1000);
-//                } catch (InterruptedException ex) {
-//                }
-//            }
-//        }
-//        return connect;
-//    }
+
     public static void reconnectTicketMapQueueInThread() {
         boolean connect = false;
         while (!connect) {
@@ -154,26 +129,19 @@ public class Client {
     public static void ticketMapQueueInThread() throws RemoteException, FileNotFoundException {
         if(ticketMapQueue != null && !ticketMapQueue.isEmpty()){
             for(Map.Entry<Integer, Ticket> entry : ticketMapQueue.entrySet()){
-                boolean check = nearestCities.isTicketId(entry.getKey());
-                if(check){
-                    System.out.println("Ticket № " + entry.getKey() + " is not ready yet");
+
+                if(personalClientTickets.contains(entry.getKey())){
+                    boolean check = nearestCities.isTicketId(entry.getKey());
+                    if(check){
+                        System.out.println("Ticket № " + entry.getKey() + " is not ready yet");
+                    }
+                    else{
+                        nearestCities(entry.getKey());
+//                    deleteTicket(entry.getKey());
+//                    ticketMapQueue.remove(entry.getKey());
+                    }
+
                 }
-                else{
-                    nearestCities(entry.getKey());
-                    deleteTicket(entry.getKey());
-                    ticketMapQueue.remove(entry.getKey());
-                }
-//                if(personalClientTickets.contains(entry.getKey())){
-//                    boolean check = nearestCities.isTicketId(entry.getKey());
-//                    if(check){
-//                        System.out.println("Ticket № " + entry.getKey() + " is not ready yet");
-//                    }
-//                    else{
-//                        nearestCities(entry.getKey());
-//                        deleteTicket(entry.getKey());
-//                        ticketMapQueue.remove(entry.getKey());
-//                    }
-//                }
 
             }
         }
@@ -193,9 +161,9 @@ public class Client {
 
 
 
-    public static void deleteTicket(int id) throws RemoteException {
-        nearestCities.deleteTicket(id);
-    }
+//    public static void deleteTicket(int id) throws RemoteException {
+//        nearestCities.deleteTicket(id);
+//    }
 
     public static String sameNameCitiesCount(String cityName) throws IOException {
         List<CityData> list = nearestCities.sameNameCitiesCount(cityName);

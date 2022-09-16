@@ -71,11 +71,11 @@ public class RemoteNearestCitiesServer implements NearestCities{
         return map;
     }
 
-    @Override
-    public String deleteTicket(int id) throws RemoteException {
-        ticketCache.deleteTicket(id);
-        return "";
-    }
+//    @Override
+//    public String deleteTicket(int id) throws RemoteException {
+//        ticketCache.deleteTicket(id);
+//        return "";
+//    }
 
     @Override
     public boolean isTicketId(int id) throws RemoteException {

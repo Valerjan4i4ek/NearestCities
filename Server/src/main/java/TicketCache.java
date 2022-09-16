@@ -94,9 +94,9 @@ public class TicketCache {
 
     public void deleteTicket(int id) {
         if(ticketInnerMap.containsKey(id) && resultsMap.containsKey(id)){
-            ticketInnerMap.remove(id);
-            resultsMap.remove(id);
-//            resultsList.remove(id);
+//            ticketInnerMap.remove(id);
+//            resultsMap.remove(id);
+            resultsList.remove(id);
             sql.deleteTicket(id);
         }
     }
