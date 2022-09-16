@@ -10,7 +10,7 @@ public class TicketCache {
     List<Integer> listTicketId;
     int countTicketId;
 
-    public Map<Integer, Ticket> getInnerMapTicketCache(List<Ticket> list){
+    public synchronized Map<Integer, Ticket> getInnerMapTicketCache(List<Ticket> list){
         Map<Integer, Ticket> map = new ConcurrentHashMap<>();
         for(Ticket ticket : list){
             map.put(ticket.getId(), ticket);
@@ -18,28 +18,25 @@ public class TicketCache {
         return map;
     }
 
-    public Map<Integer, Map<CityData, Integer>> getResults(){
+    public synchronized Map<Integer, Map<CityData, Integer>> getResults(){
         Map<Integer, Map<CityData, Integer>> map = new LinkedHashMap<>();
         for(Integer i : resultsList){
             if(ticketInnerMap.containsKey(i)){
                 map.put(i, resultsMap.get(i));
             }
-//            else{
-//                System.out.println("another client task or no task");
-//            }
         }
         return map;
     }
 
-    public void addListResults(List<Integer> listTicketId){
+    public synchronized void addListResults(List<Integer> listTicketId){
         resultsList.addAll(listTicketId);
     }
 
-    public void addMapResults(int ticketId, Map<CityData, Integer> map){
+    public synchronized void addMapResults(int ticketId, Map<CityData, Integer> map){
         resultsMap.put(ticketId, map);
     }
 
-    public Map<Integer, Ticket> ticketMapQueueWithoutArgs(){
+    public synchronized Map<Integer, Ticket> ticketMapQueueWithoutArgs(){
         Map<Integer, Ticket> map = new LinkedHashMap<>();
 
         if(resultsList != null && !resultsList.isEmpty()){
@@ -57,7 +54,7 @@ public class TicketCache {
         return map;
     }
 
-    public Map<Integer, Ticket> ticketMapQueue(List<Integer> ticketList){
+    public synchronized Map<Integer, Ticket> ticketMapQueue(List<Integer> ticketList){
         Map<Integer, Ticket> map = new LinkedHashMap<>();
         addListResults(ticketList);
         if(ticketList != null && !ticketList.isEmpty()){
@@ -76,7 +73,7 @@ public class TicketCache {
     }
 
 
-    public int addTicket(double lat, double lon, int distance) {
+    public synchronized int addTicket(double lat, double lon, int distance) {
         incrementTicketId();
         ticketInnerMap.put(countTicketId, new Ticket(countTicketId, lat, lon, distance));
         sql.addTicket(new Ticket(countTicketId, lat, lon, distance));
@@ -92,10 +89,10 @@ public class TicketCache {
         }
     }
 
-    public void deleteTicket(int id) {
+    public synchronized void deleteTicket(int id) {
         if(ticketInnerMap.containsKey(id) && resultsMap.containsKey(id)){
-//            ticketInnerMap.remove(id);
-//            resultsMap.remove(id);
+            ticketInnerMap.remove(id);
+            resultsMap.remove(id);
             resultsList.remove(id);
             sql.deleteTicket(id);
         }

@@ -64,17 +64,7 @@ public class Client {
             }
         }).start();
 
-        new Thread(() -> {
-            while (!Thread.currentThread().isInterrupted()){
-                try {
-                    ticketMapQueueInThread();
-                } catch (RemoteException e) {
-//                        e.printStackTrace();
-                } catch (FileNotFoundException e) {
-//                        e.printStackTrace();
-                }
-            }
-        }).start();
+
 
 
         letsStart();
@@ -121,7 +111,17 @@ public class Client {
             System.out.println("Incorrect :(");
             letsStart();
         }
-
+        new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()){
+                try {
+                    ticketMapQueueInThread();
+                } catch (RemoteException e) {
+//                        e.printStackTrace();
+                } catch (FileNotFoundException e) {
+//                        e.printStackTrace();
+                }
+            }
+        }).start();
 
     }
 
