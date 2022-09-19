@@ -10,6 +10,7 @@ public class MyThread extends Thread{
     private final static String JSON_FILE_NAME = "Server/citylist.json";
     private final TicketCache ticketCache;
     Calculator calculation = new Calculator();
+    OpenWeatherMapJsonParser openWeatherMapJsonParser = new OpenWeatherMapJsonParser();
 //    TicketCache ticketCache = new TicketCache();
 
     public MyThread(TicketCache ticketCache){
@@ -23,24 +24,50 @@ public class MyThread extends Thread{
 
     @Override
     public void run(){
-        Map<Integer, Ticket> ticketMap = ticketCache.ticketMapQueueWithoutArgs();
-        Map<CityData, Integer> map = new LinkedHashMap<>();
-        if(ticketMap != null && !ticketMap.isEmpty()){
-            for(Map.Entry<Integer, Ticket> entry : ticketMap.entrySet()){
-                try {
-                    map = nearestCitiesCalculate(entry.getValue());
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
+        while (true){
+            try {
+                Thread.sleep(1000);
+
+                Map<Integer, Ticket> ticketMap = ticketCache.ticketMapQueueWithoutArgs();
+                Map<CityData, Integer> map = new LinkedHashMap<>();
+                ResultsAnswer resultsAnswer = null;
+                if(ticketMap != null && !ticketMap.isEmpty()){
+
+                    for(Map.Entry<Integer, Ticket> entry : ticketMap.entrySet()){
+                        try {
+                            map = nearestCitiesCalculate(entry.getValue());
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                        resultsAnswer = resultsAnswerInThread(map);
+                        ticketCache.addResultsAnswer(entry.getKey(), resultsAnswer);
+//                        ticketCache.addMapResults(entry.getKey(), map);
+
+                    }
                 }
-                ticketCache.addMapResults(entry.getKey(), map);
-                ticketCache.deleteTicket(entry.getKey());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     }
 
+    public ResultsAnswer resultsAnswerInThread(Map<CityData, Integer> map){
+        String s = "";
+        ResultsAnswer resultsAnswer = null;
+        if(map != null && !map.isEmpty()){
+            for(Map.Entry<CityData, Integer> pair : map.entrySet()){
+                s = openWeatherMapJsonParser.getReadyForecast(pair.getKey().getName());
+                resultsAnswer = new ResultsAnswer(pair.getKey(), pair.getValue(), s);
+            }
+        }
+
+        return resultsAnswer;
+    }
+
     public Map<CityData, Integer> nearestCitiesCalculate(Ticket ticket) throws RemoteException, FileNotFoundException {
+
         List<CityData> cityDataList = jsonToCityData(JSON_FILE_NAME);
         Map<CityData, Integer> map = new HashMap<>();
         int distance = 0;

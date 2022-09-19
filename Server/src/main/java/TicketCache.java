@@ -6,6 +6,7 @@ public class TicketCache {
     List<Ticket> ticketList = sql.getTicketCache();
     Map<Integer, Ticket> ticketInnerMap = getInnerMapTicketCache(ticketList);
     Map<Integer, Map<CityData, Integer>> resultsMap = new LinkedHashMap<>();
+    Map<Integer, ResultsAnswer> resultsAnswerMap = new LinkedHashMap<>();
     List<Integer> resultsList = new LinkedList<>();
     List<Integer> listTicketId;
     int countTicketId;
@@ -28,6 +29,16 @@ public class TicketCache {
         return map;
     }
 
+    public synchronized Map<Integer, ResultsAnswer> getResultsAnswerMap(){
+        Map<Integer, ResultsAnswer> map = new LinkedHashMap<>();
+        for(Integer i : resultsList){
+            if(ticketInnerMap.containsKey(i)){
+                map.put(i, resultsAnswerMap.get(i));
+            }
+        }
+        return map;
+    }
+
     public synchronized void addListResults(List<Integer> listTicketId){
         resultsList.addAll(listTicketId);
     }
@@ -36,10 +47,16 @@ public class TicketCache {
         resultsMap.put(ticketId, map);
     }
 
+    public synchronized void addResultsAnswer(int ticketId, ResultsAnswer resultsAnswer){
+        resultsAnswerMap.put(ticketId, resultsAnswer);
+    }
+
     public synchronized Map<Integer, Ticket> ticketMapQueueWithoutArgs(){
+
         Map<Integer, Ticket> map = new LinkedHashMap<>();
 
         if(resultsList != null && !resultsList.isEmpty()){
+
             for(int i : resultsList){
                 if(ticketInnerMap.containsKey(i)){
                     map.put(i, ticketInnerMap.get(i));
@@ -92,7 +109,8 @@ public class TicketCache {
     public synchronized void deleteTicket(int id) {
         if(ticketInnerMap.containsKey(id) && resultsMap.containsKey(id)){
             ticketInnerMap.remove(id);
-            resultsMap.remove(id);
+            resultsAnswerMap.remove(id);
+//            resultsMap.remove(id);
             resultsList.remove(id);
             sql.deleteTicket(id);
         }

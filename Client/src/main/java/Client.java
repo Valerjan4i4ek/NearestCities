@@ -136,9 +136,9 @@ public class Client {
                         System.out.println("Ticket № " + entry.getKey() + " is not ready yet");
                     }
                     else{
-                        nearestCities(entry.getKey());
-//                    deleteTicket(entry.getKey());
-//                    ticketMapQueue.remove(entry.getKey());
+//                        nearestCities(entry.getKey());
+                        nearestCitiesAnswers(entry.getKey());
+                        deleteTicket(entry.getKey());
                     }
 
                 }
@@ -159,11 +159,19 @@ public class Client {
         }
     }
 
+    public static void nearestCitiesAnswers(int ticketId) throws FileNotFoundException, RemoteException{
+        List<ResultsAnswer> resultsAnswersList = nearestCities.getResultsAnswerMap(ticketId);
+        if(resultsAnswersList != null && !resultsAnswersList.isEmpty()){
+            for(ResultsAnswer r : resultsAnswersList){
+                System.out.println(r.getCityData().getName() + " " + r.getCityData().getCountry() + " " +
+                        r.getCityData().getState() + " " + r.getDistance() + r.getOpenWeatherMapJsonParser());
+            }
+        }
+    }
 
-
-//    public static void deleteTicket(int id) throws RemoteException {
-//        nearestCities.deleteTicket(id);
-//    }
+    public static void deleteTicket(int id) throws RemoteException {
+        nearestCities.deleteTicket(id);
+    }
 
     public static String sameNameCitiesCount(String cityName) throws IOException {
         List<CityData> list = nearestCities.sameNameCitiesCount(cityName);

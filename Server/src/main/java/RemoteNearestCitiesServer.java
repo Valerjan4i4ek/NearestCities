@@ -71,11 +71,24 @@ public class RemoteNearestCitiesServer implements NearestCities{
         return map;
     }
 
-//    @Override
-//    public String deleteTicket(int id) throws RemoteException {
-//        ticketCache.deleteTicket(id);
-//        return "";
-//    }
+    @Override
+    public List<ResultsAnswer> getResultsAnswerMap(int ticketId) throws RemoteException {
+        Map<Integer, ResultsAnswer> checkMap = ticketCache.getResultsAnswerMap();
+        List<ResultsAnswer> list = new ArrayList<>();
+        if(checkMap != null && !checkMap.isEmpty()){
+            if(checkMap.containsKey(ticketId)){
+                list.add(checkMap.get(ticketId));
+//                ticketCache.deleteTicket(ticketId);
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public String deleteTicket(int id) throws RemoteException {
+        ticketCache.deleteTicket(id);
+        return "";
+    }
 
     @Override
     public boolean isTicketId(int id) throws RemoteException {
@@ -86,5 +99,7 @@ public class RemoteNearestCitiesServer implements NearestCities{
     public Map<Integer, Ticket> ticketMapQueue(List<Integer> ticketList) throws RemoteException {
         return ticketCache.ticketMapQueue(ticketList);
     }
+
+
 }
 
